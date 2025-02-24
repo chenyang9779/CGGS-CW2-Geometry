@@ -1,3 +1,11 @@
+code/build/
+
+**/build/
+**/build_windows/
+**/build_macos/
+**/build_linux/
+
+
 # Prerequisites
 *.d
 
