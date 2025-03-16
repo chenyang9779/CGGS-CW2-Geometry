@@ -20,14 +20,14 @@ Eigen::VectorXd compute_angle_defect(const Eigen::MatrixXd &V,
     // TODO
 
     int nF = F.rows();
-    for (int f = 0; f < nF; ++f) {
+    for (int f = 0; f < nF; ++f)
+    {
         int i0 = F(f, 0);
         int i1 = F(f, 1);
         int i2 = F(f, 2);
         Eigen::RowVector3d v0 = V.row(i0);
         Eigen::RowVector3d v1 = V.row(i1);
         Eigen::RowVector3d v2 = V.row(i2);
-        
 
         {
             Eigen::RowVector3d a = v1 - v0;
@@ -54,7 +54,8 @@ Eigen::VectorXd compute_angle_defect(const Eigen::MatrixXd &V,
         }
     }
 
-    for (int i = 0; i < V.rows(); ++i) {
+    for (int i = 0; i < V.rows(); ++i)
+    {
         if (boundVMask(i) == 1)
             G(i) = M_PI - angleSums(i);
         else

@@ -15,7 +15,6 @@
 #include <chrono>
 #include <filesystem>
 
-
 using namespace Eigen;
 using namespace std;
 
@@ -25,40 +24,44 @@ MatrixXd V, Hn;
 SparseMatrix<double> d0, W;
 VectorXd vorAreas, H;
 
-
-int main()
+int main(int argc, char** argv)
 {
-    readOFF(DATA_PATH "/cheburashka.off",V, F);
-    create_edge_list(F, E, EF, boundEMask, boundVMask, boundVertices);
+  if (argc < 2)
+  {
+    cerr << "Usage: " << argv[0] << " <mesh.off>" << endl;
+    return 1;
+  }
 
-    polyscope::init();
-    polyscope::SurfaceMesh* psMesh = polyscope::registerSurfaceMesh("Mesh", V, F);
-    
-    auto start = std::chrono::high_resolution_clock::now();
-    VectorXd G = compute_angle_defect(V, F, boundVMask);
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "Function took " << (double)(duration.count())/1000.0 << " seconds to execute." << std::endl;
-    
-    start = std::chrono::high_resolution_clock::now();
-    compute_laplacian(V, F, E, EF, boundEMask, d0, W, vorAreas);
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-      std::cout << "Function took " << (double)(duration.count())/1000.0 << " seconds to execute." << std::endl;
-    
-    
-    start = std::chrono::high_resolution_clock::now();
-    compute_mean_curvature_normal(V, F, d0.transpose()*W*d0, vorAreas, Hn, H);
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "Function took " << (double)(duration.count())/1000.0 << " seconds to execute." << std::endl;
-   
-    psMesh->addVertexScalarQuantity("Gaussian Curvature", G.array()/vorAreas.array())->setEnabled(true);
-    psMesh->addVertexScalarQuantity("Gaussian Regions", G.unaryExpr([](double x) { return (x > 0) - (x < 0); }));
-    psMesh->addVertexScalarQuantity("Mean Curvature", H);
-    psMesh->addVertexVectorQuantity("Mean Curvature Normal", Hn);
-    
-    polyscope::show();
-    
+  // 1) Load mesh and compute normals
+  readOFF(argv[1], V, F);
+  create_edge_list(F, E, EF, boundEMask, boundVMask, boundVertices);
+
+  polyscope::init();
+  polyscope::SurfaceMesh *psMesh = polyscope::registerSurfaceMesh("Mesh", V, F);
+
+  auto start = std::chrono::high_resolution_clock::now();
+  VectorXd G = compute_angle_defect(V, F, boundVMask);
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+  std::cout << "Function took " << (double)(duration.count()) / 1000.0 << " seconds to execute." << std::endl;
+
+  start = std::chrono::high_resolution_clock::now();
+  compute_laplacian(V, F, E, EF, boundEMask, d0, W, vorAreas);
+  end = std::chrono::high_resolution_clock::now();
+  duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+  std::cout << "Function took " << (double)(duration.count()) / 1000.0 << " seconds to execute." << std::endl;
+
+  start = std::chrono::high_resolution_clock::now();
+  compute_mean_curvature_normal(V, F, d0.transpose() * W * d0, vorAreas, Hn, H);
+  end = std::chrono::high_resolution_clock::now();
+  duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+  std::cout << "Function took " << (double)(duration.count()) / 1000.0 << " seconds to execute." << std::endl;
+
+  psMesh->addVertexScalarQuantity("Gaussian Curvature", G.array() / vorAreas.array())->setEnabled(true);
+  psMesh->addVertexScalarQuantity("Gaussian Regions", G.unaryExpr([](double x)
+                                                                  { return (x > 0) - (x < 0); }));
+  psMesh->addVertexScalarQuantity("Mean Curvature", H);
+  psMesh->addVertexVectorQuantity("Mean Curvature Normal", Hn);
+
+  polyscope::show();
 }
-

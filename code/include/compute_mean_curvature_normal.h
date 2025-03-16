@@ -15,7 +15,6 @@ void compute_mean_curvature_normal(const Eigen::MatrixXd &V,
     int nV = V.rows();
     int nF = F.rows();
 
-
     MatrixXd Lv = L * V;
 
     Hn.resize(nV, 3);
@@ -24,8 +23,6 @@ void compute_mean_curvature_normal(const Eigen::MatrixXd &V,
         double area = vorAreas(i);
         Hn.row(i) = Lv.row(i) / (2.0 * area);
     }
-
-    
 
     MatrixXd faceNormals(nF, 3);
     for (int f = 0; f < nF; ++f)
